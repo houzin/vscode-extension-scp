@@ -1,0 +1,80 @@
+{
+  "name": "vscode-extension-scp",
+  "displayName": "VS Code SCP",
+  "description": "SCP file transfer extension for VS Code",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.60.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onCommand:vscode-extension-scp.connect",
+    "onCommand:vscode-extension-scp.upload",
+    "onCommand:vscode-extension-scp.download",
+    "onCommand:vscode-extension-scp.openExplorer"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "vscode-extension-scp.connect",
+        "title": "SCP: Connect to Server"
+      },
+      {
+        "command": "vscode-extension-scp.upload",
+        "title": "SCP: Upload File"
+      },
+      {
+        "command": "vscode-extension-scp.download",
+        "title": "SCP: Download File"
+      },
+      {
+        "command": "vscode-extension-scp.openExplorer",
+        "title": "SCP: Open File Explorer"
+      }
+    ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "scp-explorer",
+          "title": "SCP Explorer",
+          "icon": "resources/remote.svg"
+        }
+      ]
+    },
+    "views": {
+      "scp-explorer": [
+        {
+          "type": "webview",
+          "id": "scpExplorerView",
+          "name": "SCP File Explorer"
+        }
+      ]
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile && npm run lint",
+    "lint": "eslint src --ext ts",
+    "test": "node ./out/test/runTest.js"
+  },
+  "devDependencies": {
+    "@types/node": "^16.11.7",
+    "@types/ssh2": "^1.15.5",
+    "@types/vscode": "^1.60.0",
+    "@typescript-eslint/eslint-plugin": "^5.30.0",
+    "@typescript-eslint/parser": "^5.30.0",
+    "eslint": "^8.13.0",
+    "typescript": "^4.7.2"
+  },
+  "dependencies": {
+    "ssh2": "^1.11.0"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="128" height="128" viewBox="0 0 128 128" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path d="M88 36C88 25.5066 77.9264 17 65.5 17H62.5C50.0736 17 40 25.5066 40 36C40 46.4934 50.0736 55 62.5 55H65.5C77.9264 55 88 63.5066 88 74C88 84.4934 77.9264 93 65.5 93H62.5C50.0736 93 40 84.4934 40 74" 
+        stroke="#424242" 
+        stroke-width="12" 
+        stroke-linecap="round"
+        fill="none"/>
+  <path d="M88 36C88 25.5066 77.9264 17 65.5 17H62.5C50.0736 17 40 25.5066 40 36C40 46.4934 50.0736 55 62.5 55H65.5C77.9264 55 88 63.5066 88 74C88 84.4934 77.9264 93 65.5 93H62.5C50.0736 93 40 84.4934 40 74" 
+        stroke="#ffffff" 
+        stroke-width="8" 
+        stroke-linecap="round"
+        fill="none"/>
+</svg> 
