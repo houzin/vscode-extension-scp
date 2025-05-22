@@ -1,40 +1,53 @@
 {
-  "name": "vscode-extension-scp",
-  "displayName": "VS Code SCP",
-  "description": "SCP file transfer extension for VS Code",
-  "version": "0.0.1",
+  "name": "vscode-scp-gui",
+  "displayName": "VS Code SFTP & SCP GUI",
+  "description": "A GUI-based SCP SFTP file transfer extension for VS Code with remote file explorer, making remote file management easy and intuitive",
+  "version": "0.7.0",
+  "publisher": "houzin",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/houzin/vscode-scp-gui"
+  },
+  "bugs": {
+    "url": "https://github.com/houzin/vscode-scp-gui/issues"
+  },
+  "homepage": "https://github.com/houzin/vscode-scp-gui#readme",
   "engines": {
     "vscode": "^1.60.0"
   },
   "categories": [
     "Other"
   ],
+  "icon": "resources/icon.png",
+  "galleryBanner": {
+    "color": "#2D2D2D",
+    "theme": "dark"
+  },
   "activationEvents": [
-    "onCommand:vscode-extension-scp.connect",
-    "onCommand:vscode-extension-scp.upload",
-    "onCommand:vscode-extension-scp.download",
-    "onCommand:vscode-extension-scp.openExplorer"
+    "*"
   ],
   "main": "./out/extension.js",
   "contributes": {
     "commands": [
       {
-        "command": "vscode-extension-scp.connect",
-        "title": "SCP: Connect to Server"
-      },
-      {
-        "command": "vscode-extension-scp.upload",
-        "title": "SCP: Upload File"
-      },
-      {
-        "command": "vscode-extension-scp.download",
-        "title": "SCP: Download File"
-      },
-      {
         "command": "vscode-extension-scp.openExplorer",
-        "title": "SCP: Open File Explorer"
+        "title": "Open SCP GUI Explorer",
+        "category": "SCP GUI"
+      },
+      {
+        "command": "vscode-extension-scp.sendToScp",
+        "title": "Send to SCP GUI",
+        "category": "SCP GUI"
       }
     ],
+    "menus": {
+      "explorer/context": [
+        {
+          "command": "vscode-extension-scp.sendToScp",
+          "group": "2_workspace"
+        }
+      ]
+    },
     "viewsContainers": {
       "activitybar": [
         {
@@ -49,18 +62,22 @@
         {
           "type": "webview",
           "id": "scpExplorerView",
-          "name": "SCP File Explorer"
+          "name": "SCP File Explorer",
+          "retainContextWhenHidden": true
         }
       ]
     }
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",
-    "compile": "tsc -p ./",
+    "compile": "tsc -p ./ && npm run copy-resources",
     "watch": "tsc -watch -p ./",
     "pretest": "npm run compile && npm run lint",
     "lint": "eslint src --ext ts",
-    "test": "node ./out/test/runTest.js"
+    "test": "node ./out/test/runTest.js",
+    "copy-resources": "node scripts/copy-resources.js",
+    "package": "npm run compile && npx vsce package",
+    "clean": "rimraf out"
   },
   "devDependencies": {
     "@types/node": "^16.11.7",
@@ -72,9 +89,34 @@
     "typescript": "^4.7.2"
   },
   "dependencies": {
-    "ssh2": "^1.11.0"
+    "@types/node-ssh": "^7.0.6",
+    "@types/ssh2-sftp-client": "^9.0.4",
+    "asn1": "^0.2.6",
+    "bcrypt-pbkdf": "^1.0.2",
+    "is-stream": "^2.0.0",
+    "make-dir": "^3.1.0",
+    "node-ssh": "^13.2.1",
+    "sb-promise-queue": "^2.1.0",
+    "sb-scandir": "^3.1.0",
+    "shell-escape": "^0.2.0",
+    "ssh2": "^1.11.0",
+    "ssh2-sftp-client": "^12.0.0"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC"
+  "keywords": [
+    "scp",
+    "sftp",
+    "file transfer",
+    "remote",
+    "ssh",
+    "remote development",
+    "file explorer",
+    "secure copy",
+    "remote file system"
+  ],
+  "author": {
+    "name": "HOUZIN",
+    "url": "https://github.com/houzin"
+  },
+  "license": "MIT",
+  "private": false
 }

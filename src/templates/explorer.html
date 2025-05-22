@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>SCP Explorer</title>
+    <link rel="stylesheet" href="styles/explorer.css">
+</head>
+<body>
+    <!-- 连接管理面板 -->
+    <div class="connection-manager">
+        <div class="connection-list">
+            <div class="connection-list-header">
+                <h3>Saved Connections</h3>
+                <button id="newConnectionBtn" class="icon-button" title="New Connection">
+                    <svg class="icon"><use xlink:href="#icon-add"></use></svg>
+                </button>
+            </div>
+            <div id="savedConnections" class="saved-connections"></div>
+        </div>
+        
+        <div class="connection-form" style="display: none;">
+            <input type="text" id="connectionName" placeholder="Connection Name">
+            <input type="text" id="host" placeholder="Host (e.g. example.com)">
+            <input type="text" id="port" placeholder="Port (default: 22)">
+            <input type="text" id="username" placeholder="Username">
+            <div id="passwordAuth">
+                <input type="password" id="password" placeholder="Password">
+            </div>
+            <div class="auth-toggle">
+                <label class="toggle-label">
+                    <input type="checkbox" id="useKeyAuth">
+                    <span class="toggle-text">Use SSH Key Authentication</span>
+                </label>
+            </div>
+            <div id="keyAuth" style="display: none;">
+                <div class="key-input-group">
+                    <input type="text" id="privateKeyPath" placeholder="Private Key Path" readonly>
+                    <button id="browseKeyBtn" class="icon-button" title="Browse Private Key">
+                        <svg class="icon"><use xlink:href="#icon-folder"></use></svg>
+                    </button>
+                </div>
+                <input type="password" id="keyPassphrase" placeholder="Key Passphrase (if any)">
+            </div>
+            <div class="form-buttons">
+                <button id="saveConnectionBtn">Save Connection</button>
+                <button id="connectBtn" class="connect-btn status-disconnected">🔴 Connect</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="split-view">
+        <!-- Local file panel -->
+        <div class="file-pane">
+            <div class="pane-title">
+                Local Files
+                <div class="toolbar">
+                    <button id="localNewFolderBtn" title="Create local folder">
+                        <svg class="icon"><use xlink:href="#icon-folder-add"></use></svg>
+                    </button>
+                    <button id="localRefreshBtn" title="Refresh local files">
+                        <svg class="icon"><use xlink:href="#icon-refresh"></use></svg>
+                    </button>
+                    <button id="localDeleteBtn" title="Delete local files">
+                        <svg class="icon"><use xlink:href="#icon-trash"></use></svg>
+                    </button>
+                </div>
+            </div>
+            <div id="localPathNavigator" class="path-navigator"></div>
+            <div id="localFileList" class="file-list"></div>
+        </div>
+
+        <!-- Transfer buttons -->
+        <div class="transfer-buttons">
+            <button id="uploadBtn" title="Upload">
+                <svg class="icon"><use xlink:href="#icon-upload"></use></svg>
+            </button>
+            <button id="downloadBtn" title="Download">
+                <svg class="icon"><use xlink:href="#icon-download"></use></svg>
+            </button>
+        </div>
+
+        <!-- Remote file panel -->
+        <div class="file-pane">
+            <div class="pane-title">
+                Remote Files
+                <div class="toolbar">
+                    <button id="remoteNewFolderBtn" title="Create remote folder">
+                        <svg class="icon"><use xlink:href="#icon-folder-add"></use></svg>
+                    </button>
+                    <button id="remoteRefreshBtn" title="Refresh remote files">
+                        <svg class="icon"><use xlink:href="#icon-refresh"></use></svg>
+                    </button>
+                    <button id="remoteDeleteBtn" title="Delete remote files">
+                        <svg class="icon"><use xlink:href="#icon-trash"></use></svg>
+                    </button>
+                </div>
+            </div>
+            <div id="remotePathNavigator" class="path-navigator"></div>
+            <div id="remoteFileList" class="file-list"></div>
+        </div>
+    </div>
+
+    <!-- New folder dialog -->
+    <div id="newFolderDialog" class="dialog-overlay">
+        <div class="dialog">
+            <div class="form-group">
+                <input type="text" id="newFolderName" placeholder="Enter folder name">
+            </div>
+            <div class="dialog-buttons">
+                <button id="cancelNewFolder">Cancel</button>
+                <button id="confirmNewFolder">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Context menu -->
+    <div id="contextMenu" class="context-menu" style="display: none">
+        <div class="context-menu-item" id="contextMenuRename">Rename</div>
+        <div class="context-menu-item" id="contextMenuDelete">Delete</div>
+    </div>
+
+    <!-- Confirm dialog -->
+    <div id="confirmDialog" class="dialog-overlay" style="display: none">
+        <div class="confirm-dialog">
+            <div id="confirmMessage"></div>
+            <div class="confirm-dialog-buttons">
+                <button id="confirmCancel">Cancel</button>
+                <button id="confirmOk">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Rename dialog -->
+    <div id="renameDialog" class="dialog-overlay">
+        <div class="dialog">
+            <div class="form-group">
+                <input type="text" id="newFileName" placeholder="Enter new file name">
+            </div>
+            <div class="dialog-buttons">
+                <button id="cancelRename">Cancel</button>
+                <button id="confirmRename">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Progress bar -->
+    <div class="progress-overlay" id="progressOverlay">
+        <div class="progress-dialog">
+            <div class="progress-text" id="progressText">Uploading: safety_normal.bmp</div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="progress-percentage" id="progressPercentage">100%</div>
+            <button id="cancelTransferBtn" class="cancel-btn">Cancel</button>
+        </div>
+    </div>
+
+    <div id="toast" class="toast"></div>
+
+    <!-- 连接编辑对话框 -->
+    <div id="connectionDialog" class="dialog-overlay">
+        <div class="dialog">
+            <h3 id="dialogTitle">编辑连接</h3>
+            <div class="form-group">
+                <input type="text" id="editConnectionName" placeholder="连接名称">
+                <input type="text" id="editHost" placeholder="主机地址">
+                <input type="text" id="editPort" placeholder="端口">
+                <input type="text" id="editUsername" placeholder="用户名">
+                <input type="password" id="editPassword" placeholder="密码">
+            </div>
+            <div class="dialog-buttons">
+                <button id="cancelEditConnection" class="secondary-btn">取消</button>
+                <button id="deleteConnectionBtn" class="danger-btn">删除</button>
+                <button id="saveEditConnection" class="primary-btn">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 确认删除对话框 -->
+    <div id="confirmDeleteDialog" class="dialog-overlay">
+        <div class="dialog">
+            <h3>Confirm Delete</h3>
+            <p>Are you sure you want to delete this connection?</p>
+            <div class="dialog-buttons">
+                <button id="cancelDelete" class="secondary-btn">Cancel</button>
+                <button id="confirmDelete" class="danger-btn">Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="scripts/explorer.js"></script>
+    <!-- SVG ICON SPRITE (Outline Style) -->
+    <svg style="display:none;">
+        <symbol id="icon-folder-add" viewBox="0 0 24 24">
+            <path d="M3 7V5a2 2 0 0 1 2-2h4l2 3h7a2 2 0 0 1 2 2v2" stroke="currentColor" stroke-width="2" fill="none"/>
+            <path d="M12 14v6m3-3h-6" stroke="currentColor" stroke-width="2" fill="none"/>
+            <rect x="3" y="11" width="18" height="10" rx="2" stroke="currentColor" stroke-width="2" fill="none"/>
+        </symbol>
+        <symbol id="icon-refresh" viewBox="0 0 24 24">
+            <path d="M20 11a8.1 8.1 0 0 0-15.5-2M4 4v5h5" stroke="currentColor" stroke-width="2" fill="none"/>
+            <path d="M4 13a8.1 8.1 0 0 0 15.5 2M20 20v-5h-5" stroke="currentColor" stroke-width="2" fill="none"/>
+        </symbol>
+        <symbol id="icon-trash" viewBox="0 0 24 24">
+            <path d="M4 7h16M10 11v6M14 11v6M5 7v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7" stroke="currentColor" stroke-width="2" fill="none"/>
+            <path d="M9 7V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v3" stroke="currentColor" stroke-width="2" fill="none"/>
+        </symbol>
+        <symbol id="icon-upload" viewBox="0 0 24 24">
+            <path d="M5 12h14" stroke="currentColor" stroke-width="2" fill="none"/>
+            <path d="M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" fill="none"/>
+        </symbol>
+        <symbol id="icon-download" viewBox="0 0 24 24">
+            <path d="M19 12H5" stroke="currentColor" stroke-width="2" fill="none"/>
+            <path d="M11 6l-6 6 6 6" stroke="currentColor" stroke-width="2" fill="none"/>
+        </symbol>
+        <symbol id="icon-add" viewBox="0 0 24 24">
+            <path d="M12 4v16m-8-8h16" stroke="currentColor" stroke-width="2" fill="none"/>
+        </symbol>
+        <symbol id="icon-edit" viewBox="0 0 24 24">
+            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" stroke="currentColor" stroke-width="2" fill="none"/>
+            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" stroke-width="2" fill="none"/>
+        </symbol>
+        <symbol id="icon-folder" viewBox="0 0 24 24">
+            <path d="M3 7V5a2 2 0 0 1 2-2h4l2 3h7a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7z" stroke="currentColor" stroke-width="2" fill="none"/>
+        </symbol>
+    </svg>
+</body>
+</html> 

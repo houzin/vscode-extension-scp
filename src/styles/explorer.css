@@ -1,0 +1,765 @@
+body {
+    padding: 5px;
+    color: var(--vscode-foreground);
+    font-family: var(--vscode-font-family);
+}
+
+.form-group {
+    margin-bottom: 6px;
+}
+
+input {
+    width: 100%;
+    padding: 3px 0px 3px 10px;
+    margin: 1px 0 0 1px;
+    background: color-mix(in srgb, var(--vscode-input-background) 85%, white);
+    color: var(--vscode-input-foreground);
+    border: 1px solid var(--vscode-input-border);
+}
+
+input:focus {
+    outline: 1px solid var(--vscode-focusBorder);
+    border-color: var(--vscode-focusBorder);
+}
+
+button {
+    background: var(--vscode-button-background);
+    color: var(--vscode-button-foreground);
+    border: none;
+    padding: 3px 6px;
+    cursor: pointer;
+    margin: 3px 0;
+}
+
+button:hover {
+    background: var(--vscode-button-hoverBackground);
+}
+
+.file-list {
+    margin-top: 10px;
+    border: 1px solid var(--vscode-input-border);
+}
+
+.file-item {
+    display: flex;
+    align-items: center;
+    padding: 2px 6px;
+    cursor: pointer;
+    position: relative;
+    gap: 4px;
+}
+
+.file-item:hover {
+    background: var(--vscode-list-hoverBackground);
+}
+
+.file-checkbox {
+    display: none;
+    margin-right: 8px;
+    cursor: pointer;
+    width: 16px;
+    height: 16px;
+    accent-color: var(--vscode-button-background);
+    vertical-align: middle;
+    border-radius: 4px;
+    box-shadow: 0 0 0 1px var(--vscode-input-border);
+}
+
+.file-item:hover .file-checkbox {
+    display: inline-block;
+}
+
+.file-item.selected .file-checkbox,
+.file-item.multi-selected .file-checkbox {
+    display: inline-block;
+}
+
+.file-item .file-icon {
+    margin-right: 5px;
+    font-size: 18px;
+    vertical-align: middle;
+}
+
+.file-item span,
+.file-item input[type="checkbox"] {
+    vertical-align: middle;
+}
+
+#status {
+    margin: 10px 0;
+    padding: 5px 0 5px 0;
+    font-size: 15px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 24px;
+}
+
+.status-dot {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    margin-right: 4px;
+    background: #bbb;
+}
+
+.status-dot.connected {
+    background: #43a047;
+}
+
+.status-dot.error {
+    background: #d32f2f;
+}
+
+.status-dot.disconnected {
+    background: #bbb;
+}
+
+#status.error {
+    color: #d32f2f;
+}
+
+.error {
+    color: var(--vscode-errorForeground);
+}
+
+.toolbar {
+    display: flex;
+    flex-direction: row;
+    gap: 6px;
+    margin: 0;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+.dialog-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+}
+
+.dialog {
+    background: var(--vscode-editor-background);
+    padding: 20px;
+    border: 1px solid var(--vscode-input-border);
+    border-radius: 6px;
+    /* min-width: 400px; */
+    max-width: 600px;
+    position: relative;
+    z-index: 1001;
+}
+
+.dialog h3 {
+    margin: 0 0 15px 0;
+    color: var(--vscode-foreground);
+}
+
+.dialog p {
+    margin: 10px 0 20px 0;
+    color: var(--vscode-foreground);
+}
+
+.dialog-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.dialog-buttons button {
+    min-width: 80px;
+    padding: 6px 12px;
+    cursor: pointer;
+    border: none;
+    border-radius: 4px;
+    font-size: 13px;
+}
+
+.primary-btn {
+    background: var(--vscode-button-background);
+    color: var(--vscode-button-foreground);
+}
+
+.primary-btn:hover {
+    background: var(--vscode-button-hoverBackground);
+}
+
+.secondary-btn {
+    background: var(--vscode-button-secondaryBackground);
+    color: var(--vscode-button-secondaryForeground);
+}
+
+.secondary-btn:hover {
+    background: var(--vscode-button-secondaryHoverBackground);
+}
+
+.danger-btn {
+    background: #d32f2f;
+    color: white;
+}
+
+.danger-btn:hover {
+    background: #b71c1c;
+}
+
+/* 确保对话框显示时可以点击 */
+.dialog-overlay[style*="display: block"] {
+    display: flex !important;
+}
+
+.path-navigator {
+    margin: 3px 0;
+    padding: 3px;
+    background: var(--vscode-input-background);
+    border: 1px solid var(--vscode-input-border);
+    display: flex;
+    align-items: center;
+    overflow-x: auto;
+    white-space: nowrap;
+}
+
+.path-part {
+    display: inline-flex;
+    align-items: center;
+    cursor: pointer;
+    padding: 2px 4px;
+    border-radius: 3px;
+}
+
+.path-part:hover {
+    background: var(--vscode-list-hoverBackground);
+}
+
+.path-separator {
+    margin: 0 4px;
+    color: var(--vscode-descriptionForeground);
+}
+
+.current-path {
+    font-weight: bold;
+    color: var(--vscode-editor-foreground);
+}
+
+.context-menu {
+    position: fixed;
+    background: var(--vscode-editor-background);
+    border: 1px solid var(--vscode-input-border);
+    padding: 5px 0;
+    z-index: 1000;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.context-menu-item {
+    padding: 5px 15px;
+    cursor: pointer;
+}
+
+.context-menu-item:hover {
+    background: var(--vscode-list-hoverBackground);
+}
+
+.file-item.selected {
+    background: var(--vscode-list-activeSelectionBackground);
+    color: var(--vscode-list-activeSelectionForeground);
+}
+
+.file-item.multi-selected {
+    background: var(--vscode-list-inactiveSelectionBackground);
+    color: var(--vscode-list-inactiveSelectionForeground);
+}
+
+.confirm-dialog {
+    background: var(--vscode-editor-background);
+    padding: 15px;
+    border: 1px solid var(--vscode-input-border);
+    max-width: 400px;
+    word-break: break-word;
+}
+
+.confirm-dialog-buttons {
+    margin-top: 15px;
+    text-align: right;
+}
+
+.confirm-dialog-buttons button {
+    margin-left: 10px;
+}
+
+.split-view {
+    display: flex;
+    gap: 6px;
+    margin-top: 6px;
+    align-items: stretch;
+}
+
+.file-pane {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.pane-title {
+    font-weight: bold;
+    padding: 3px;
+    background: var(--vscode-sideBar-background);
+    border: 1px solid var(--vscode-input-border);
+    margin-bottom: 3px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.file-list {
+    flex: 1;
+    overflow: auto;
+}
+
+.transfer-buttons {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-width: 30px;
+    height: 100%;
+    padding: 0;
+    margin-top: 30px;
+    gap: 4px;
+}
+
+.transfer-buttons button {
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.progress-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 2000;
+    align-items: center;
+    justify-content: center;
+}
+
+.progress-dialog {
+    background: #ffffff;
+    padding: 20px;
+    border-radius: 8px;
+    min-width: 300px;
+    max-width: 400px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.progress-text {
+    color: #333;
+    font-size: 14px;
+    margin-bottom: 12px;
+    text-align: left;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 6px;
+    background: #e0e0e0;
+    border-radius: 3px;
+    overflow: hidden;
+    margin: 8px 0;
+}
+
+.progress-fill {
+    height: 100%;
+    width: 0;
+    background: #2196f3;
+    border-radius: 3px;
+    transition: width 0.3s ease;
+}
+
+.progress-percentage {
+    color: #666;
+    font-size: 12px;
+    text-align: right;
+    margin: 8px 0 16px;
+}
+
+.cancel-btn {
+    width: 100%;
+    padding: 8px 0;
+    background: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: background-color 0.2s;
+}
+
+.cancel-btn:hover {
+    background: #c82333;
+}
+
+.cancel-btn:active {
+    background: #bd2130;
+}
+
+.toast {
+    display: none;
+    position: fixed;
+    bottom: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #323232;
+    color: #fff;
+    padding: 12px 32px;
+    border-radius: 6px;
+    font-size: 16px;
+    z-index: 9999;
+    opacity: 0.95;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    transition: all 0.3s;
+}
+.toast.error {
+    background: #d32f2f;
+}
+
+.empty-message {
+    padding: 20px;
+    text-align: center;
+    color: #aaa;
+    font-style: italic;
+}
+
+.connect-btn {
+    min-width: 120px;
+    width: auto;
+    height: 32px !important;
+    font-size: 14px;
+    font-weight: 600;
+    margin: 0 !important;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    border: none;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.connect-btn.status-connected {
+    background: #2e7d32;
+    color: #fff;
+}
+
+.connect-btn.status-connected:hover {
+    background: #1b5e20;
+}
+
+.connect-btn.status-connecting {
+    background: #f57c00;
+    color: #fff;
+    cursor: wait;
+}
+
+.connect-btn.status-disconnected, .connect-btn.status-error {
+    background: #d32f2f;
+    color: #fff;
+}
+
+.connect-btn.status-disconnected:hover, .connect-btn.status-error:hover {
+    background: #b71c1c;
+}
+
+.connect-btn:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+/* 工具列與傳輸按鈕：無底色，icon 變大且藍色 */
+.toolbar button,
+.transfer-buttons button {
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    padding: 0 !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: none;
+    transition: background 0.18s;
+}
+
+.toolbar button .icon,
+.transfer-buttons button .icon {
+    width: 22px !important;
+    height: 22px !important;
+    color: #1976d2 !important;
+    stroke: #1976d2 !important;
+    fill: none !important;
+    stroke-width: 2.2;
+    display: block;
+}
+
+.toolbar button:hover .icon,
+.transfer-buttons button:hover .icon {
+    color: #1256a0 !important;
+    stroke: #1256a0 !important;
+}
+
+/* 连接管理器样式 */
+.connection-manager {
+    margin-bottom: 10px;
+    border: 1px solid var(--vscode-input-border);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.connection-list {
+    background: var(--vscode-sideBar-background);
+    padding: 6px;
+}
+
+.connection-list-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+}
+
+.connection-list-header h3 {
+    margin: 0;
+    font-size: 14px;
+    color: var(--vscode-foreground);
+}
+
+.saved-connections {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.connection-item {
+    display: flex;
+    align-items: center;
+    padding: 0px 0px 0px 8px;
+    background: var(--vscode-editor-background);
+    border: 1px solid var(--vscode-input-border);
+    border-radius: 3px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.connection-item:hover {
+    background: var(--vscode-list-hoverBackground);
+}
+
+.connection-item.active {
+    background: var(--vscode-list-activeSelectionBackground);
+    border-color: var(--vscode-focusBorder);
+}
+
+.connection-item.active .connection-item-name,
+.connection-item.active .connection-item-details {
+    color: var(--vscode-list-activeSelectionForeground);
+}
+
+.connection-item-info {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.connection-item-name {
+    font-weight: bold;
+    color: var(--vscode-foreground);
+    white-space: nowrap;
+}
+
+.connection-item-details {
+    font-size: 12px;
+    color: var(--vscode-descriptionForeground);
+    white-space: nowrap;
+}
+
+.connection-item-actions {
+    display: flex;
+    gap: 8px;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.connection-item:hover .connection-item-actions {
+    opacity: 1;
+}
+
+.icon-button {
+    background: transparent;
+    border: none;
+    padding: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+}
+
+.icon-button:hover {
+    background: var(--vscode-button-hoverBackground);
+}
+
+.icon-button .icon {
+    width: 16px;
+    height: 16px;
+    color: var(--vscode-foreground);
+}
+
+.connection-form {
+    padding: 8px;
+    background: var(--vscode-editor-background);
+    border-top: 1px solid var(--vscode-input-border);
+}
+
+.form-buttons {
+    display: flex;
+    gap: 12px;
+    margin-top: 16px;
+}
+
+.form-buttons button {
+    flex: 1;
+    height: 32px;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    font-weight: 600;
+    transition: all 0.2s ease;
+    border: none;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* 确保图标在选中状态下也是可见的 */
+.connection-item.active .icon-button .icon {
+    color: var(--vscode-list-activeSelectionForeground) !important;
+    stroke: var(--vscode-list-activeSelectionForeground) !important;
+}
+
+/* 确保按钮在选中状态下hover效果明显 */
+.connection-item.active .icon-button:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.connection-item-actions .delete-btn {
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.connection-item:hover .delete-btn {
+    opacity: 1;
+}
+
+.connection-item.active .delete-btn {
+    opacity: 1;
+}
+
+.delete-btn .icon {
+    color: #d32f2f !important;
+    stroke: #d32f2f !important;
+}
+
+.delete-btn:hover .icon {
+    color: #b71c1c !important;
+    stroke: #b71c1c !important;
+}
+
+/* 确保删除按钮在深色主题下也清晰可见 */
+.vscode-dark .delete-btn .icon {
+    color: #ff5252 !important;
+    stroke: #ff5252 !important;
+}
+
+/* SSH Key 认证相关样式 */
+.auth-toggle {
+    margin: 8px 0;
+    display: flex;
+    align-items: center;
+}
+
+.toggle-label {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    user-select: none;
+}
+
+.toggle-label input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    margin-right: 8px;
+    accent-color: var(--vscode-button-background);
+}
+
+.toggle-text {
+    color: var(--vscode-foreground);
+    font-size: 13px;
+}
+
+.key-input-group {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 6px;
+}
+
+.key-input-group input[type="text"] {
+    flex: 1;
+    background: color-mix(in srgb, var(--vscode-input-background) 85%, white);
+    color: var(--vscode-input-foreground);
+    border: 1px solid var(--vscode-input-border);
+    padding: 3px 8px;
+}
+
+.key-input-group .icon-button {
+    padding: 4px;
+    background: transparent;
+    border: 1px solid var(--vscode-input-border);
+    border-radius: 3px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.key-input-group .icon-button:hover {
+    background: var(--vscode-button-hoverBackground);
+}
+
+.key-input-group .icon-button .icon {
+    width: 16px;
+    height: 16px;
+    color: var(--vscode-foreground);
+    stroke: var(--vscode-foreground);
+} 

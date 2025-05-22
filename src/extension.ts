@@ -2,40 +2,70 @@ import * as vscode from 'vscode';
 import { Client } from 'ssh2';
 import * as fs from 'fs';
 import * as path from 'path';
-import { ScpExplorerProvider } from './ScpExplorerProvider';
+import { ScpExplorerProvider } from './providers/scp-explorer.provider';
 
 let currentConnection: Client | null = null;
 
 export function activate(context: vscode.ExtensionContext) {
-    const scpExplorerProvider = new ScpExplorerProvider(context.extensionUri);
+    const scpExplorerProvider = new ScpExplorerProvider(context.extensionUri, context);
     
     context.subscriptions.push(
-        vscode.window.registerWebviewViewProvider(ScpExplorerProvider.viewType, scpExplorerProvider)
+        vscode.window.registerWebviewViewProvider(
+            ScpExplorerProvider.viewType,
+            scpExplorerProvider,
+            {
+                webviewOptions: {
+                    retainContextWhenHidden: true
+                }
+            }
+        )
     );
 
-    // 註冊打開文件瀏覽器的命令
-    let openExplorerCommand = vscode.commands.registerCommand('vscode-extension-scp.openExplorer', () => {
-        vscode.commands.executeCommand('scp-explorer.focus');
-    });
+    // 註冊所有命令
+    const commands = [
+        vscode.commands.registerCommand('vscode-extension-scp.openExplorer', () => {
+            vscode.commands.executeCommand('scpExplorerView.focus');
+        }),
+        vscode.commands.registerCommand('vscode-extension-scp.sendToScp', async (uri: vscode.Uri) => {
+            // Try to get the file from active editor if no uri provided
+            if (!uri) {
+                const activeEditor = vscode.window.activeTextEditor;
+                if (activeEditor) {
+                    uri = activeEditor.document.uri;
+                }
+            }
 
-    context.subscriptions.push(openExplorerCommand);
+            if (!uri) {
+                vscode.window.showErrorMessage('Please select a file or folder to send');
+                return;
+            }
+
+            // Open SCP Explorer view first
+            await vscode.commands.executeCommand('scpExplorerView.focus');
+
+            // Notify WebView to prepare for upload
+            scpExplorerProvider.prepareForUpload(uri.fsPath);
+        })
+    ];
+
+    context.subscriptions.push(...commands);
 
     // 连接到服务器
     let connectCommand = vscode.commands.registerCommand('vscode-extension-scp.connect', async () => {
         const host = await vscode.window.showInputBox({
-            prompt: '输入服务器地址',
-            placeHolder: '例如: example.com'
+            prompt: 'Enter server address',
+            placeHolder: 'e.g. example.com'
         });
         if (!host) return;
 
         const username = await vscode.window.showInputBox({
-            prompt: '输入用户名',
-            placeHolder: '例如: root'
+            prompt: 'Enter username',
+            placeHolder: 'e.g. root'
         });
         if (!username) return;
 
         const password = await vscode.window.showInputBox({
-            prompt: '输入密码',
+            prompt: 'Enter password',
             password: true
         });
         if (!password) return;
@@ -44,11 +74,11 @@ export function activate(context: vscode.ExtensionContext) {
         
         client.on('ready', () => {
             currentConnection = client;
-            vscode.window.showInformationMessage(`成功连接到 ${host}`);
+            vscode.window.showInformationMessage(`Successfully connected to ${host}`);
         });
 
         client.on('error', (err) => {
-            vscode.window.showErrorMessage(`连接错误: ${err.message}`);
+            vscode.window.showErrorMessage(`Connection error: ${err.message}`);
         });
 
         client.connect({
@@ -61,7 +91,7 @@ export function activate(context: vscode.ExtensionContext) {
     // 上传文件
     let uploadCommand = vscode.commands.registerCommand('vscode-extension-scp.upload', async () => {
         if (!currentConnection) {
-            vscode.window.showErrorMessage('请先连接到服务器');
+            vscode.window.showErrorMessage('Please connect to server first');
             return;
         }
 
@@ -74,8 +104,8 @@ export function activate(context: vscode.ExtensionContext) {
         if (!fileUris || fileUris.length === 0) return;
 
         const remotePath = await vscode.window.showInputBox({
-            prompt: '输入远程目标路径',
-            placeHolder: '例如: /home/user/'
+            prompt: 'Enter remote target path',
+            placeHolder: 'e.g. /home/user/'
         });
         if (!remotePath) return;
 
@@ -84,15 +114,15 @@ export function activate(context: vscode.ExtensionContext) {
 
         currentConnection.sftp((err, sftp) => {
             if (err) {
-                vscode.window.showErrorMessage(`SFTP错误: ${err.message}`);
+                vscode.window.showErrorMessage(`SFTP error: ${err.message}`);
                 return;
             }
 
             sftp.fastPut(filePath, `${remotePath}/${fileName}`, (err) => {
                 if (err) {
-                    vscode.window.showErrorMessage(`上传失败: ${err.message}`);
+                    vscode.window.showErrorMessage(`Upload failed: ${err.message}`);
                 } else {
-                    vscode.window.showInformationMessage('文件上传成功');
+                    vscode.window.showInformationMessage('File uploaded successfully');
                 }
             });
         });
@@ -101,13 +131,13 @@ export function activate(context: vscode.ExtensionContext) {
     // 下载文件
     let downloadCommand = vscode.commands.registerCommand('vscode-extension-scp.download', async () => {
         if (!currentConnection) {
-            vscode.window.showErrorMessage('请先连接到服务器');
+            vscode.window.showErrorMessage('Please connect to server first');
             return;
         }
 
         const remotePath = await vscode.window.showInputBox({
-            prompt: '输入远程文件路径',
-            placeHolder: '例如: /home/user/file.txt'
+            prompt: 'Enter remote file path',
+            placeHolder: 'e.g. /home/user/file.txt'
         });
         if (!remotePath) return;
 
@@ -124,21 +154,27 @@ export function activate(context: vscode.ExtensionContext) {
 
         currentConnection.sftp((err, sftp) => {
             if (err) {
-                vscode.window.showErrorMessage(`SFTP错误: ${err.message}`);
+                vscode.window.showErrorMessage(`SFTP error: ${err.message}`);
                 return;
             }
 
             sftp.fastGet(remotePath, targetPath, (err) => {
                 if (err) {
-                    vscode.window.showErrorMessage(`下载失败: ${err.message}`);
+                    vscode.window.showErrorMessage(`Download failed: ${err.message}`);
                 } else {
-                    vscode.window.showInformationMessage('文件下载成功');
+                    vscode.window.showInformationMessage('File downloaded successfully');
                 }
             });
         });
     });
 
-    context.subscriptions.push(connectCommand, uploadCommand, downloadCommand);
+    // 注册断开连接命令
+    let disconnectCommand = vscode.commands.registerCommand('vscode-extension-scp.disconnected', () => {
+        // 通知 WebView 连接已断开
+        scpExplorerProvider.notifyDisconnected();
+    });
+
+    context.subscriptions.push(connectCommand, uploadCommand, downloadCommand, disconnectCommand);
 }
 
 export function deactivate() {
